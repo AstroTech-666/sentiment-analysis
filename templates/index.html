@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Styling emoji area */
+        #emoji-display {
+            font-size: 5rem;
+            margin: 20px 0;
+        }
+
+        /* Styling the result box */
+        .result-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            word-wrap: break-word;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sentiment Analysis</h1>
+        <form method="post">
+            <textarea name="text" rows="4" placeholder="Enter text here">{{ text }}</textarea><br>
+            <button type="submit">Analyze Sentiment</button>
+        </form>
+
+        <!-- Display emoji with blinking effect based on sentiment -->
+        <div id="emoji-display" class="emoji"></div>
+        
+        <!-- Button to stop blinking -->
+        <button onclick="stopBlinking()">Stop</button>
+
+        <!-- Small box for showing the entered text temporarily -->
+        <div class="result-box" id="result-box">
+            {% if sentiment %}
+                <p><strong>Entered Text:</strong> {{ text }}</p>
+            {% endif %}
+        </div>
+
+        {% if sentiment %}
+            <h3>Sentiment: <span>{{ sentiment }}</span></h3>
+        {% endif %}
+    </div>
+
+    <script>
+        const emojiList = {
+            positive: ["😃", "😊", "🥳", "😎", "🤩", "😄", "😁", "😆", "😉", "💪", "🏆", "🌟", "🤗", "💃", "🎉", "🌈", "🥰", "✨", "😍", "🥳"],
+            negative: ["😞", "😢", "💀", "😩", "😡", "😔", "😖", "😣", "😫", "😭", "👎", "👺", "🖤", "⚰️", "☠️", "😤", "😿", "🛑", "💔", "🔪"],
+            neutral: ["😐", "😶", "😑", "🤔", "😜", "😏", "😬", "🧐", "🤨", "🤥", "🥱", "😴", "🙄", "💤", "👀", "😳", "😅", "🤖", "🥴", "🤡"]
+        };
+        
+        let blinkInterval;
+
+        function getRandomEmoji(sentiment) {
+            if (sentiment === "positive") {
+                return emojiList.positive[Math.floor(Math.random() * emojiList.positive.length)];
+            } else if (sentiment === "negative") {
+                return emojiList.negative[Math.floor(Math.random() * emojiList.negative.length)];
+            } else {
+                return emojiList.neutral[Math.floor(Math.random() * emojiList.neutral.length)];
+            }
+        }
+
+        // Start blinking based on sentiment once page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            const sentiment = '{{ sentiment }}'; // Flask renders sentiment from Python here
+            if (sentiment) {
+                startBlinking(sentiment);
+            }
+        });
+
+        function startBlinking(sentiment) {
+            stopBlinking(); // Stop any existing interval
+            blinkInterval = setInterval(() => {
+                document.getElementById('emoji-display').textContent = getRandomEmoji(sentiment);
+            }, 300);  // Blinking speed (300ms)
+        }
+
+        function stopBlinking() {
+            clearInterval(blinkInterval);
+        }
+    </script>
+</body>
+</html>

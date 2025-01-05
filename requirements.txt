@@ -1,0 +1,8 @@
+flask
+transformers
+torch
+nltk
+pandas
+scikit-learn
+seaborn
+wordcloud
